@@ -1,3 +1,26 @@
+// Theme Management
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+}
+
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+}
+
+function updateThemeIcon(theme) {
+    const themeIcon = document.querySelector('.theme-toggle i');
+    if (themeIcon) {
+        themeIcon.className = theme === 'light' ? 'fas fa-sun' : 'fas fa-moon';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const toggleButton = document.getElementById('toggle-mode');
     const body = document.body;
@@ -6,63 +29,79 @@ document.addEventListener('DOMContentLoaded', () => {
         body.classList.toggle('light-mode');
     });
 
-    // Initialize all components
+    initTheme();
     initNavigation();
     initTypingEffect();
     initScrollAnimations();
     initContactForm();
     initParticles();
+    initializeGallery();
+
+    // Setup theme toggle
+    const themeToggle = document.querySelector('.theme-toggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+    }
 });
 
 // Mobile Navigation
 function initNavigation() {
-    const navToggle = document.getElementById('nav-toggle');
-    const navLinks = document.querySelector('.nav-links');
+    const dockLinks = document.querySelectorAll('.dock-link');
+    const themeToggle = document.getElementById('theme-toggle');
     
-    // Toggle mobile menu
-    navToggle?.addEventListener('click', () => {
-        navLinks.classList.toggle('active');
-        navToggle.querySelector('i').classList.toggle('fa-bars');
-        navToggle.querySelector('i').classList.toggle('fa-times');
-    });
-
-    // Smooth scroll for navigation links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                // Close mobile menu if open
-                navLinks.classList.remove('active');
-                
-                // Smooth scroll to target
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
+    // Handle active state for dock links
+    dockLinks.forEach(link => {
+        if (link.getAttribute('href') === window.location.hash || 
+            link.getAttribute('href') === window.location.pathname) {
+            link.classList.add('active');
+        }
+        
+        link.addEventListener('click', function() {
+            dockLinks.forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Handle smooth scroll for hash links
+            const href = this.getAttribute('href');
+            if (href.startsWith('#')) {
+                event.preventDefault();
+                const target = document.querySelector(href);
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
             }
         });
     });
-
-    // Add scroll effect to navbar
-    let lastScroll = 0;
+    
+    // Handle theme toggle
+    let isDark = true;
+    themeToggle.addEventListener('click', () => {
+        isDark = !isDark;
+        document.body.classList.toggle('light-mode');
+        themeToggle.querySelector('i').classList.toggle('fa-sun');
+        themeToggle.querySelector('i').classList.toggle('fa-moon');
+    });
+    
+    // Update active state on scroll
     window.addEventListener('scroll', () => {
-        const navbar = document.querySelector('.navbar');
-        const currentScroll = window.pageYOffset;
-
-        if (currentScroll <= 0) {
-            navbar.classList.remove('scroll-up');
-            return;
-        }
-
-        if (currentScroll > lastScroll && !navbar.classList.contains('scroll-down')) {
-            navbar.classList.remove('scroll-up');
-            navbar.classList.add('scroll-down');
-        } else if (currentScroll < lastScroll && navbar.classList.contains('scroll-down')) {
-            navbar.classList.remove('scroll-down');
-            navbar.classList.add('scroll-up');
-        }
-        lastScroll = currentScroll;
+        const sections = document.querySelectorAll('section[id]');
+        let current = '';
+        
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (window.scrollY >= sectionTop - 60) {
+                current = '#' + section.getAttribute('id');
+            }
+        });
+        
+        dockLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === current) {
+                link.classList.add('active');
+            }
+        });
     });
 }
 
@@ -195,6 +234,182 @@ function initParticles() {
             
             particlesContainer.appendChild(particle);
         }
+    }
+}
+
+// Project Gallery Functions
+function initializeGallery() {
+    const projectsGrid = document.getElementById('projects-grid');
+    const searchInput = document.getElementById('search-projects');
+    const sortSelect = document.getElementById('sort-by');
+    
+    if (!projectsGrid) return; // Only run on project pages
+    
+    // Load and display projects
+    loadProjects().then(projects => {
+        renderProjects(projects);
+        
+        // Setup search functionality
+        searchInput?.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredProjects = projects.filter(project => 
+                project.title.toLowerCase().includes(searchTerm) ||
+                project.description.toLowerCase().includes(searchTerm)
+            );
+            renderProjects(filteredProjects);
+        });
+        
+        // Setup sorting
+        sortSelect?.addEventListener('change', (e) => {
+            const sortedProjects = [...projects].sort((a, b) => {
+                switch(e.target.value) {
+                    case 'rating':
+                        return b.rating - a.rating;
+                    case 'popular':
+                        return (b.comments?.length || 0) - (a.comments?.length || 0);
+                    case 'newest':
+                    default:
+                        return new Date(b.date) - new Date(a.date);
+                }
+            });
+            renderProjects(sortedProjects);
+        });
+    });
+}
+
+function renderProjects(projects) {
+    const grid = document.getElementById('projects-grid');
+    if (!grid) return;
+    
+    grid.innerHTML = projects.map(project => `
+        <div class="project-card" data-id="${project.id}">
+            <div class="project-media">
+                ${project.media[0]?.endsWith('.mp4') 
+                    ? `<video src="${project.media[0]}" muted loop></video>`
+                    : `<img src="${project.media[0]}" alt="${project.title}">`
+                }
+            </div>
+            <div class="project-info">
+                <h3>${project.title}</h3>
+                <p>${project.description.substring(0, 100)}...</p>
+                <div class="project-rating">
+                    ${createStarRating(project.rating)}
+                    <span>(${project.ratings?.length || 0})</span>
+                </div>
+                <button class="btn view-project" data-id="${project.id}">View Details</button>
+            </div>
+        </div>
+    `).join('');
+    
+    // Add click handlers for project cards
+    document.querySelectorAll('.view-project').forEach(btn => {
+        btn.addEventListener('click', () => openProjectModal(btn.dataset.id));
+    });
+}
+
+function openProjectModal(projectId) {
+    const modal = document.getElementById('project-modal');
+    const project = projects.find(p => p.id === parseInt(projectId));
+    if (!modal || !project) return;
+    
+    modal.style.display = 'block';
+    
+    // Populate modal content
+    document.getElementById('modal-title').textContent = project.title;
+    
+    // Setup media carousel
+    const mediaContainer = modal.querySelector('.project-media');
+    mediaContainer.innerHTML = project.media.map(media => 
+        media.endsWith('.mp4')
+            ? `<video src="${media}" controls></video>`
+            : `<img src="${media}" alt="${project.title}">`
+    ).join('');
+    
+    // Setup rating functionality
+    const stars = modal.querySelectorAll('.star-rating i');
+    stars.forEach(star => {
+        star.addEventListener('click', () => rateProject(projectId, parseInt(star.dataset.rating)));
+    });
+    
+    // Load comments
+    loadComments(projectId);
+    
+    // Setup comment form
+    const commentForm = document.getElementById('comment-form');
+    commentForm.onsubmit = (e) => {
+        e.preventDefault();
+        const comment = commentForm.querySelector('textarea').value;
+        addComment(projectId, comment);
+        commentForm.reset();
+    };
+}
+
+function rateProject(projectId, rating) {
+    const project = projects.find(p => p.id === parseInt(projectId));
+    if (!project) return;
+    
+    project.ratings = project.ratings || [];
+    project.ratings.push(rating);
+    project.rating = project.ratings.reduce((a, b) => a + b) / project.ratings.length;
+    
+    // Update UI
+    document.querySelector('.rating-count').textContent = 
+        `(${project.ratings.length} rating${project.ratings.length === 1 ? '' : 's'})`;
+    updateStarRating(rating);
+    
+    // Save to storage
+    saveProjects();
+}
+
+function addComment(projectId, text) {
+    const project = projects.find(p => p.id === parseInt(projectId));
+    if (!project) return;
+    
+    project.comments = project.comments || [];
+    const comment = {
+        id: Date.now(),
+        text,
+        date: new Date().toISOString(),
+        likes: 0
+    };
+    
+    project.comments.unshift(comment);
+    loadComments(projectId); // Refresh comments display
+    saveProjects();
+}
+
+function loadComments(projectId) {
+    const project = projects.find(p => p.id === parseInt(projectId));
+    const commentsList = document.querySelector('.comments-list');
+    if (!commentsList || !project?.comments) return;
+    
+    commentsList.innerHTML = project.comments.map(comment => `
+        <div class="comment">
+            <p>${comment.text}</p>
+            <div class="comment-meta">
+                <span>${new Date(comment.date).toLocaleDateString()}</span>
+                <button class="like-btn" data-id="${comment.id}">
+                    <i class="fas fa-heart"></i> ${comment.likes}
+                </button>
+            </div>
+        </div>
+    `).join('');
+    
+    // Add like functionality
+    commentsList.querySelectorAll('.like-btn').forEach(btn => {
+        btn.onclick = () => likeComment(projectId, parseInt(btn.dataset.id));
+    });
+}
+
+function likeComment(projectId, commentId) {
+    const project = projects.find(p => p.id === parseInt(projectId));
+    if (!project) return;
+    
+    const comment = project.comments.find(c => c.id === commentId);
+    if (comment) {
+        comment.likes++;
+        loadComments(projectId); // Refresh comments
+        saveProjects();
     }
 }
 

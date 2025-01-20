@@ -1,6 +1,51 @@
+// Check if current user is admin
+function isAdmin() {
+    // Check if admin token exists in localStorage
+    return localStorage.getItem('adminToken') === 'your-secure-admin-token';
+}
+
+// Initialize admin login
+function initializeAdminLogin() {
+    const loginSection = document.getElementById('admin-login');
+    const loginForm = document.getElementById('admin-login-form');
+    
+    // Show login form if not admin
+    if (!isAdmin()) {
+        loginSection.style.display = 'block';
+    }
+    
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const password = document.getElementById('admin-password').value;
+        
+        // Replace this with your actual admin password
+        if (password === 'your-admin-password') {
+            localStorage.setItem('adminToken', 'your-secure-admin-token');
+            loginSection.style.display = 'none';
+            document.querySelector('.upload-section').style.display = 'block';
+            initializeUploadForm();
+            showNotification('Logged in as admin successfully!');
+        } else {
+            showNotification('Invalid admin password!', 'error');
+        }
+        
+        loginForm.reset();
+    });
+}
+
 // Initialize the page when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    initializeUploadForm();
+    const uploadSection = document.querySelector('.upload-section');
+    
+    // Only show upload form for admin
+    if (isAdmin()) {
+        uploadSection.style.display = 'block';
+        initializeUploadForm();
+    } else {
+        uploadSection.style.display = 'none';
+    }
+    
+    initializeAdminLogin();
     initializeProjects();
     initializeModal();
     initializeFilters();

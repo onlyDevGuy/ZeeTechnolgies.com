@@ -3,33 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python Projects Gallery - Zee Technologies</title>
+    <title>Python Projects - Zee Technologies</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="python-projects.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="scripts.js" defer></script>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-brand">
+    <nav class="side-dock">
+        <div class="dock-brand">
             <span class="logo">ZT</span>
-            <span class="brand-name">Zee Technologies</span>
         </div>
-        <div class="nav-toggle" id="nav-toggle">
-            <i class="fas fa-bars"></i>
-        </div>
-        <ul class="nav-links">
-            <li><a href="index.html#home">Home</a></li>
-            <li><a href="index.html#about">About</a></li>
-            <li><a href="index.html#services">Services</a></li>
-            <li><a href="python-projects.html" class="active">Python Projects</a></li>
-            <li><a href="javascript-projects.html">JavaScript Projects</a></li>
-            <li><a href="vbnet-projects.html">VB.NET Projects</a></li>
-            <li><a href="web-projects.html">Web Projects</a></li>
-            <li><a href="index.html#contact">Contact</a></li>
+        <ul class="dock-links">
+            <li>
+                <a href="index.html" class="dock-link" data-tooltip="Home">
+                    <i class="fas fa-home"></i>
+                </a>
+            </li>
+            <li>
+                <a href="index.html#about" class="dock-link" data-tooltip="About">
+                    <i class="fas fa-user"></i>
+                </a>
+            </li>
+            <li>
+                <a href="index.html#services" class="dock-link" data-tooltip="Services">
+                    <i class="fas fa-cogs"></i>
+                </a>
+            </li>
+            <li>
+                <a href="python-projects.html" class="dock-link active" data-tooltip="Python Projects">
+                    <i class="fab fa-python"></i>
+                </a>
+            </li>
+            <li>
+                <a href="javascript-projects.html" class="dock-link" data-tooltip="JavaScript Projects">
+                    <i class="fab fa-js"></i>
+                </a>
+            </li>
+            <li>
+                <a href="vbnet-projects.html" class="dock-link" data-tooltip="VB.NET Projects">
+                    <i class="fas fa-desktop"></i>
+                </a>
+            </li>
+            <li>
+                <a href="web-projects.html" class="dock-link" data-tooltip="Web Projects">
+                    <i class="fas fa-globe"></i>
+                </a>
+            </li>
+            <li>
+                <a href="blog.html" class="dock-link" data-tooltip="Blog">
+                    <i class="fas fa-blog"></i>
+                </a>
+            </li>
+            <li>
+                <a href="index.html#contact" class="dock-link" data-tooltip="Contact">
+                    <i class="fas fa-envelope"></i>
+                </a>
+            </li>
         </ul>
+        <button class="theme-toggle" aria-label="Toggle theme">
+            <i class="fas fa-moon"></i>
+        </button>
     </nav>
 
-    <main class="projects-container">
+    <main class="main-content">
         <section class="upload-section">
             <h2>Share Your Python Project</h2>
             <form id="project-upload-form" class="upload-form">
