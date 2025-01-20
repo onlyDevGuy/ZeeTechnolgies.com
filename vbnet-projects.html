@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VB.NET Projects Gallery - Zee Technologies</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="vbnet-projects.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="logo">ZT</span>
+            <span class="brand-name">Zee Technologies</span>
+        </div>
+        <div class="nav-toggle" id="nav-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html#home">Home</a></li>
+            <li><a href="index.html#about">About</a></li>
+            <li><a href="index.html#services">Services</a></li>
+            <li><a href="python-projects.html">Python Projects</a></li>
+            <li><a href="javascript-projects.html">JavaScript Projects</a></li>
+            <li><a href="vbnet-projects.html" class="active">VB.NET Projects</a></li>
+            <li><a href="web-projects.html">Web Projects</a></li>
+            <li><a href="index.html#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <main class="projects-container">
+        <section class="upload-section">
+            <h2>Share Your VB.NET Project</h2>
+            <form id="project-upload-form" class="upload-form">
+                <div class="form-group">
+                    <label for="project-title">Project Title</label>
+                    <input type="text" id="project-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="project-description">Description</label>
+                    <textarea id="project-description" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="project-type">Application Type</label>
+                    <div class="app-type-tags">
+                        <label class="app-tag"><input type="radio" name="app-type" value="winforms"> Windows Forms</label>
+                        <label class="app-tag"><input type="radio" name="app-type" value="wpf"> WPF</label>
+                        <label class="app-tag"><input type="radio" name="app-type" value="console"> Console App</label>
+                        <label class="app-tag"><input type="radio" name="app-type" value="service"> Windows Service</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Features Used</label>
+                    <div class="feature-tags">
+                        <label class="feature-tag"><input type="checkbox" value="database"> Database Integration</label>
+                        <label class="feature-tag"><input type="checkbox" value="reporting"> Reporting</label>
+                        <label class="feature-tag"><input type="checkbox" value="api"> API Integration</label>
+                        <label class="feature-tag"><input type="checkbox" value="excel"> Excel Integration</label>
+                        <label class="feature-tag"><input type="checkbox" value="charts"> Charts & Graphs</label>
+                        <label class="feature-tag"><input type="checkbox" value="printing"> Printing Support</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="project-media">Upload Screenshots/Videos</label>
+                    <input type="file" id="project-media" accept="image/*,video/*" multiple required>
+                    <div class="media-preview" id="media-preview"></div>
+                </div>
+                <div class="form-group">
+                    <label for="project-download">Download Link (Optional)</label>
+                    <input type="url" id="project-download" placeholder="https://example.com/download">
+                </div>
+                <div class="form-group">
+                    <label for="project-source">Source Code Link (Optional)</label>
+                    <input type="url" id="project-source" placeholder="https://github.com/username/repository">
+                </div>
+                <button type="submit" class="submit-btn">Share Project</button>
+            </form>
+        </section>
+
+        <section class="projects-gallery">
+            <h2>VB.NET Projects Gallery</h2>
+            <div class="filters">
+                <div class="app-type-filter">
+                    <button class="filter-btn active" data-type="all">All Types</button>
+                    <button class="filter-btn" data-type="winforms">Windows Forms</button>
+                    <button class="filter-btn" data-type="wpf">WPF</button>
+                    <button class="filter-btn" data-type="console">Console</button>
+                    <button class="filter-btn" data-type="service">Services</button>
+                </div>
+                <div class="feature-filter">
+                    <select id="feature-select">
+                        <option value="all">All Features</option>
+                        <option value="database">Database</option>
+                        <option value="reporting">Reporting</option>
+                        <option value="api">API Integration</option>
+                        <option value="excel">Excel</option>
+                        <option value="charts">Charts</option>
+                        <option value="printing">Printing</option>
+                    </select>
+                </div>
+            </div>
+            <div class="projects-grid" id="projects-grid">
+                <!-- Project cards will be dynamically added here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Project Modal -->
+    <div class="modal" id="project-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-body">
+                <div class="project-details">
+                    <h2 id="modal-title"></h2>
+                    <div class="project-tags">
+                        <div class="app-type-tag" id="modal-app-type"></div>
+                        <div class="feature-tags" id="modal-features"></div>
+                    </div>
+                    <div class="project-gallery" id="modal-media"></div>
+                    <p id="modal-description"></p>
+                    <div class="project-links">
+                        <a id="download-link" href="#" target="_blank" class="download-btn">
+                            <i class="fas fa-download"></i> Download Application
+                        </a>
+                        <a id="source-link" href="#" target="_blank" class="source-btn">
+                            <i class="fas fa-code"></i> View Source Code
+                        </a>
+                    </div>
+                    <div class="system-requirements">
+                        <h3>System Requirements</h3>
+                        <ul>
+                            <li><i class="fas fa-desktop"></i> Windows 7 or later</li>
+                            <li><i class="fas fa-code-branch"></i> .NET Framework 4.5+</li>
+                            <li><i class="fas fa-memory"></i> 2GB RAM minimum</li>
+                            <li><i class="fas fa-hdd"></i> 100MB free space</li>
+                        </ul>
+                    </div>
+                    <div class="rating-section">
+                        <h3>Rate this project</h3>
+                        <div class="stars">
+                            <i class="fas fa-star" data-rating="1"></i>
+                            <i class="fas fa-star" data-rating="2"></i>
+                            <i class="fas fa-star" data-rating="3"></i>
+                            <i class="fas fa-star" data-rating="4"></i>
+                            <i class="fas fa-star" data-rating="5"></i>
+                        </div>
+                        <p class="rating-message"></p>
+                    </div>
+                    <div class="comments-section">
+                        <h3>Comments</h3>
+                        <form id="comment-form">
+                            <textarea placeholder="Leave a comment..." required></textarea>
+                            <button type="submit" class="submit-btn">Post Comment</button>
+                        </form>
+                        <div class="comments-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="vbnet-projects.js"></script>
+</body>
+</html>
